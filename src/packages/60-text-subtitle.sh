@@ -79,6 +79,8 @@ build_fontconfig() {
     # as well: freetype2.pc requires libbrotlidec, which in turn needs libbrotlicommon.
     if build "fontconfig" "${VER_FONTCONFIG[0]}"; then
         download "https://gitlab.freedesktop.org/api/v4/projects/890/packages/generic/fontconfig/$CURRENT_PACKAGE_VERSION/fontconfig-$CURRENT_PACKAGE_VERSION.tar.xz"
+        # Autotools omits HAVE_XLOCALE_H, which macOS needs for its locale APIs.
+        apply_inline_patch src/fcint.h 's/^#ifdef HAVE_XLOCALE_H$/#if defined(HAVE_XLOCALE_H) || defined(__APPLE__)/'
         execute ./configure PKG_CONFIG="pkg-config --static" --prefix="${WORKSPACE}" --disable-shared --enable-static --enable-libxml2 --disable-docs --disable-nls --disable-cache-build
         execute make -j "$MJOBS"
         execute make install

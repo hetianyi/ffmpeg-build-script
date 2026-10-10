@@ -73,7 +73,8 @@ build_sord() {
 
     if build "sord" "${VER_SORD[0]}"; then
         download "https://gitlab.com/drobilla/sord/-/archive/v$CURRENT_PACKAGE_VERSION/sord-v$CURRENT_PACKAGE_VERSION.tar.gz" "sord-v$CURRENT_PACKAGE_VERSION.tar.gz"
-        execute meson build --prefix="${WORKSPACE}" --buildtype=release --default-library=static --libdir="${WORKSPACE}"/lib
+        # sordmm uses C++11, but Apple Clang defaults to C++98.
+        execute meson build --prefix="${WORKSPACE}" --buildtype=release --default-library=static --libdir="${WORKSPACE}"/lib -Dcpp_std=c++11
         execute ninja -C build
         execute ninja -C build install
         build_done "sord" "$CURRENT_PACKAGE_VERSION"
